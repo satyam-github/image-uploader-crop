@@ -11,15 +11,15 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 mongoose.set('useUnifiedTopology', true);
 
-// mongoose.connect("mongodb+srv://satyam:satyam@cluster0-iwwk2.mongodb.net/image_uploader?retryWrites=true&w=majority", {
-//     useNewUrlParser: true,
-//     useCreateIndex: true 
-// });
-
-mongoose.connect(process.env.MONGODB_URI || `mongodb://localhost/image_uploader`, {
+mongoose.connect("mongodb+srv://satyam:satyam@cluster0-iwwk2.mongodb.net/image_uploader?retryWrites=true&w=majority", {
     useNewUrlParser: true,
     useCreateIndex: true 
 });
+
+// mongoose.connect(process.env.MONGODB_URI || `mongodb://localhost/image_uploader`, {
+//     useNewUrlParser: true,
+//     useCreateIndex: true 
+// });
 
 console.log("DB connected ...");
 
