@@ -80,7 +80,7 @@ class ImageUploader extends PureComponent {
 
         // checking the dimensions of image
         setTimeout(() => {
-          if(img.height === 1024 || img.width === 1024) {
+          if(img.height === 1024 && img.width === 1024) {
             this.setState({
               ...this.state,
               disabled: false
