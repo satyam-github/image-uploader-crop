@@ -4,6 +4,11 @@ import { Link } from 'react-router-dom';
 import Spinner from './Spinner/Spinner';
 import classes from './ImageUploader.module.css';
 
+/* This component fetches all images previously stored in the server
+    and gives option to user to click a particular image and see 
+    cropped variants of all four dimensions .
+*/
+
 class Images extends Component {
 
     state = {
@@ -11,6 +16,7 @@ class Images extends Component {
         loaded: false
     };
 
+    // Fetching all images stored in server
     componentDidMount () {
         axios.get('/images')
           .then(response => {
@@ -29,6 +35,7 @@ class Images extends Component {
 
         let displayImage = <Spinner />;
 
+        // Looping through fetched images to display it in the page
         if(this.state.loaded) {
           displayImage = this.state.images.map(image => (
                         <div key={image._id}

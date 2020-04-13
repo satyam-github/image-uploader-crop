@@ -11,19 +11,22 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 mongoose.set('useUnifiedTopology', true);
 
-mongoose.connect("mongodb+srv://satyam:satyam@cluster0-iwwk2.mongodb.net/image_uploader?retryWrites=true&w=majority", {
+// Setting the mongoose connection
+
+mongoose.connect(process.env.MONGODB_URI || `mongodb://localhost/image_uploader`, {
     useNewUrlParser: true,
     useCreateIndex: true 
 });
 
-// mongoose.connect(process.env.MONGODB_URI || `mongodb://localhost/image_uploader`, {
-//     useNewUrlParser: true,
-//     useCreateIndex: true 
-// });
-
 console.log("DB connected ...");
 
+/* This is for deploying on heroku server . It asks the node js server (which acts as
+    server and also serves react application) to look for React files in client/build
+*/
+
 app.use(express.static(path.join(__dirname, 'client/build')));
+
+/* This is to deal with Access-Control-Allow-Origin errors */
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -37,7 +40,8 @@ app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(express.json({ extended: false }));
 app.use('/images', imageRoute);
-// app.use('/', (req, res) => res.send("Upload your image now"));
+
+/*  This renders React file index.html  */
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname+'/client/build/index.html'));

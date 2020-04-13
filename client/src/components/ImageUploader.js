@@ -6,6 +6,17 @@ import 'react-image-crop/dist/ReactCrop.css';
 import Spinner from './Spinner/Spinner';
 import classes from './ImageUploader.module.css';
 
+/*  This is the Home page of application . It lets the user upload image 
+    of 1024 x 1024 px . If image of any other size is loaded , it disables
+    the upload button and displays the message that the image is not of correct 
+    size . 
+
+    This page also displays the other four sizes by cropping the image .
+
+    'react-image-crop' has been used for cropping the image . 
+    'axios' is used for posting the upload request to server .
+ */
+
 class ImageUploader extends PureComponent {
   state = {
     src: null,
@@ -46,20 +57,28 @@ class ImageUploader extends PureComponent {
     ]
   };
 
+  /* This method/function fetches the file which the user uploads and sets the
+      image source in the state . It also checks the sizes of image and 
+      enables/disables the "Upload to Server" button .*/
+
   onSelectFile = e => {
     if (e.target.files && e.target.files.length > 0) {
-      // console.log("Inside select File");
+      // Reseting the disabled and croppedImage state in the beginning
       this.setState({
         ...this.state,
         disabled: true,
         croppedImage: []
       });
-      // console.log("State Reset");
+      
       const reader = new FileReader();
       reader.addEventListener('load', () => {
+
+        //  setting the source of image
         this.setState({ src: reader.result })
         var img = document.createElement("img")
         img.setAttribute("src", this.state.src)
+
+        // checking the dimensions of image
         setTimeout(() => {
           if(img.height === 1024 || img.width === 1024) {
             this.setState({
@@ -67,7 +86,6 @@ class ImageUploader extends PureComponent {
               disabled: false
             })
           }
-          // console.log("Inside Timeout : " + img.height + " " + img.width);
         },0);
       });
       reader.readAsDataURL(e.target.files[0]);
@@ -75,21 +93,39 @@ class ImageUploader extends PureComponent {
     }
   };
 
-  // If you setState the crop in here you should return false.
+  /* This is one of the lifecycle method of 'react-image-crop' which 
+      gets called after image is loaded 
+  */
+
   onImageLoaded = image => {
     this.imageRef = image;
   };
 
-  onCropComplete = crop => {
-    this.makeClientCrop(crop);
-    // console.log("Inside onCropComplete");
-  };
+  /* This lifecycle method is called when the user tries to crop the image
+      In our application, we do not give any option to user to crop the image .
+      Therefore, this method is called four times when our uploaded image is
+      cropped into four sizes */
 
   onCropChange = (crop, percentCrop) => {
    
     this.setState({ crop });
     // console.log("Inside OnCropChange");
   };
+
+  /* This lifecycle method is called when the user releases control of mouse
+      while trying to crop the image . Since, we do not allow user to do this,
+      this method is called four times when our image is cropped into four 
+      sizes */
+
+  onCropComplete = crop => {
+    this.makeClientCrop(crop);
+    // console.log("Inside onCropComplete");
+  };
+
+  /* This is not the lifecycle method but it is called from onCropComplete()
+      to set the source of croppedImage . This method sends a function call
+      with the crop data (telling how much to crop) to the canvas which 
+      draws the images accordingly and returns the cropped image . */
 
   async makeClientCrop (crop) {
     if (this.imageRef && crop.width && crop.height) {
@@ -98,20 +134,31 @@ class ImageUploader extends PureComponent {
         crop,
         'newFile.jpeg'
       );
+
+      /*  We have croppedImage [] state which stores the array of objects .
+          This array of objects stores 'image name' and 'source url' of
+          the four cropped images . Each time the image is cropped in a
+          particular size , an object is made and pushed to array
+          immutably so that the component is rendered again and cropped image
+          is visible in the page */
+
       const oldCroppedImage = this.state.croppedImage;
       const croppedImageObj = {
         croppedImageName: "Dimension " + crop.width + "x" + crop.height,
         croppedImageUrl: croppedImageUrl
       }
       const updatedCroppedImage = oldCroppedImage.concat(croppedImageObj);
-      // console.log("Inside makeClientCrop Start");
+      
       this.setState({ 
         ...this.state,
         croppedImage: updatedCroppedImage
       });
-      // console.log("Inside makeClientCrop Stop" + this.state.croppedImage);
+      
     }
   }
+
+  /* This function takes the image and crop information and crops the image
+      It then returns the source of image back */
 
   getCroppedImg = (image, crop, fileName) => {
     const canvas = document.createElement('canvas');
@@ -137,6 +184,8 @@ class ImageUploader extends PureComponent {
     return canvas.toDataURL('image/jpeg');
   }
 
+  // This method is for downloading the image
+
   onDownloadHandler = (contentType, base64Data, fileName) => {
     console.log("Inside onDownloadHandler()");
     // const linkSource = `data:${contentType};base64,${base64Data}`;
@@ -147,8 +196,13 @@ class ImageUploader extends PureComponent {
     downloadLink.click();
   }
 
+  /* This is an event handler which gets called when user clicks on 
+    Submit button to upload it to database . The request is then posted
+    to server . */
+
   onSubmitHandler = async event => {
-    // console.log(this.state.croppedImage);
+
+    // Constructing image object 
 
     let imageObj = {
       imageName: "Original Image",
@@ -157,11 +211,16 @@ class ImageUploader extends PureComponent {
     };
 
     try {
-      // console.log(imageObj);
+    /* Setting the spin state to true in order to display a spinner 
+        while the server is saving the image to the database */
       this.setState({
         ...this.state,
         spin: true
       })
+
+      /* Post request to send image to server and setting spin to false
+          when the image is successfully saved . Else an alert is displayed
+          with error message . */
       await axios.post('/images', imageObj);
       this.setState({
         ...this.state,
@@ -171,6 +230,7 @@ class ImageUploader extends PureComponent {
       } catch (err) {
           alert("Error while uploading image");
       }
+      
       setTimeout(() => {
         this.setState({
           ...this.state,
@@ -182,6 +242,13 @@ class ImageUploader extends PureComponent {
   render() {
     const { src, disabled } = this.state;
     let cropsImages = null;
+
+    /* <ReactCrop> from react-image-crop is called four times only
+      if the disabled state is set to false (which is when image dimensions
+        are 1024 x 1024) . crops[] contains the height and width of the
+        'to be cropped' images which are then passed to lifecycle methods of
+        <ReactCrop> . The images is thus cropped into four sizes . */
+
     if (src && !disabled) {
       cropsImages = this.state.crops.map( crop => (
         <ReactCrop
@@ -202,11 +269,11 @@ class ImageUploader extends PureComponent {
       ))
     }
 
-    // console.log("Inside render() : croppedImage Array " + croppedImage);
-
     return (
       <div className={classes.Container}>
-          
+      
+      {/* Taking input for the image file */}
+
             <input type="file" accept="image/*" onChange={this.onSelectFile} />
             <button
               className={classes.ImageUploadButton}
@@ -214,17 +281,26 @@ class ImageUploader extends PureComponent {
               onClick={this.onSubmitHandler}>
               Upload to Server
             </button>
-            {this.state.spin && <Spinner percentage={this.state.percentage} />}
-          
+
+      {/* Spinner if the spin is set to true */}
+
+            {this.state.spin && <Spinner />}
+
+       {/* Display message when the image is successfully uploaded to server    */}
+
           {this.state.uploadStatus && 
             <p className={classes.Message}>Image uploaded Successfully</p>}
-          
+
+      {/* Asking user to upload only 1024 x 1024 px images */}
+
           {disabled && 
-          <p>Upload image of dimension 1024 x 1024 to enable Submit button </p>}  
+          <p>Upload image of size 1024 x 1024 to enable Submit button </p>}  
 
             {src && disabled && <p>Your Image does not have correct dimensions . 
                   Try uploading some other image</p>}
             
+        {/* Displaying the original image Download option */}
+
             {src && <div className={classes.ImageDetails}>
                 <h3>Uploaded Image</h3>   
                 <img src={this.state.src} alt="Original" /> 
@@ -239,6 +315,8 @@ class ImageUploader extends PureComponent {
               </div> }
 
             {cropsImages}
+
+            {/* Displaying the cropped images of four sizes */}
 
             {this.state.croppedImage && 
               this.state.croppedImage.map( cropped => (

@@ -2,6 +2,7 @@ var express = require('express');
 var Image = require('../models/Image');
 var router = express.Router();
 
+// @POST route /images
 
 router.post('/', async (req, res) => {
 
@@ -21,6 +22,9 @@ router.post('/', async (req, res) => {
     }
 });
 
+// @GET route /images
+// gets all images which were originally uploaded (not the cropped ones) by user
+
 router.get('/', async (req, res) => {
     try {
         const images = await Image.find().select({'imageName':1 ,'imageData': 1});
@@ -30,6 +34,9 @@ router.get('/', async (req, res) => {
         res.status(500).send("Unable to fetch Images");
     }
 })
+
+// @GET route /images/:id
+// gets the cropped images of a particular image whose id is passed as params
 
 router.get('/:id', async (req, res) => {
     try {   

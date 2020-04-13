@@ -3,6 +3,8 @@ import axios from 'axios';
 import Spinner from './Spinner/Spinner';
 import classes from './ImageUploader.module.css';
 
+// This component loads cropped variants of a particular image
+
 class Image extends Component {
 
     state = {
@@ -12,6 +14,7 @@ class Image extends Component {
         loaded: false
     }
 
+    // Fetching cropped dimensions of an image from server
     componentDidMount() {
         const { match: { params } } = this.props;
         axios.get(`/images/${params.id}`)
@@ -30,6 +33,7 @@ class Image extends Component {
           });
     }
 
+    // Download Handler to download the image
     onDownloadHandler = (contentType, base64Data, fileName) => {
         console.log("Inside onDownloadHandler()");
         const linkSource = `${base64Data}`;
@@ -43,6 +47,7 @@ class Image extends Component {
 
         let displayImages = <Spinner />
 
+        // Display cropped images when loaded from server
         if(this.state.loaded) {
             displayImages = this.state.croppedData.map(image => {
                 return (
