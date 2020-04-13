@@ -53,7 +53,7 @@ class ImageUploader extends PureComponent {
         y: 0,
         height: 380,
         width: 380
-      }
+      } 
     ]
   };
 
