@@ -1,0 +1,63 @@
+
+.main-heading {
+    text-transform: uppercase;
+    text-align: center;
+    color: white;
+  }
+  
+  .image-container {
+    border-radius: 1rem;
+    padding: 1.5rem;
+  }
+  
+  .process {
+    background-color: whitesmoke;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+.Button:disabled {
+    color: white;
+    cursor: not-allowed;
+    background-color: #ccc;
+}
+
+.Button {
+    color: white;
+    outline: none;
+    margin: 20px auto;
+    padding: 10px;
+    margin: 10px auto;
+    background-color: #5C9210;
+}
+
+
+.ImageHeading {
+    text-transform: uppercase;
+    text-align: center;
+    color: black;
+  }
+  
+  .ImageDetails {
+    text-align: center;
+  }
+  
+  .ImageUploadButton {
+    display: block;
+    margin: 2.5rem auto;
+    text-align: center;
+  }
+  
+  .ImageContainer {
+    display: block;
+    margin: 0 auto;
+    width: 250px;
+    height: 250px;
+  }
+/*   
+  .main-credit {
+    text-align: center;
+    color: white;
+    font-weight: bold;
+  } */
