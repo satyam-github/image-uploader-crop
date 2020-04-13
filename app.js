@@ -23,10 +23,6 @@ mongoose.connect("mongodb+srv://satyam:satyam@cluster0-iwwk2.mongodb.net/image_u
 
 console.log("DB connected ...");
 
-// const publicPath = path.join(__dirname, '/', 'public');
-// app.use(express.static(publicPath));
-
-// Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
 
 app.use((req, res, next) => {

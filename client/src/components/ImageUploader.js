@@ -1,16 +1,17 @@
 
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import ReactCrop from 'react-image-crop';
 import axios from 'axios';
 import 'react-image-crop/dist/ReactCrop.css';
+import Spinner from './Spinner/Spinner';
 import classes from './ImageUploader.module.css';
-
-// import "./App.css";
 
 class ImageUploader extends PureComponent {
   state = {
     src: null,
     disabled: true,
+    spin: false,
+    uploadStatus: false,
     croppedImage: [],
     crops: 
     [
@@ -85,8 +86,7 @@ class ImageUploader extends PureComponent {
   };
 
   onCropChange = (crop, percentCrop) => {
-    // You could also use percentCrop:
-    // this.setState({ crop: percentCrop });
+   
     this.setState({ crop });
     // console.log("Inside OnCropChange");
   };
@@ -135,23 +135,19 @@ class ImageUploader extends PureComponent {
     // console.log("Inside getCroppedImg()");
 
     return canvas.toDataURL('image/jpeg');
-
-    // return new Promise((resolve, reject) => {
-    //   canvas.toBlob(blob => {
-    //     if (!blob) {
-    //       //reject(new Error('Canvas is empty'));
-    //       console.error('Canvas is empty');
-    //       return;
-    //     }
-    //     blob.name = fileName;
-    //     window.URL.revokeObjectURL(this.fileUrl);
-    //     this.fileUrl = window.URL.createObjectURL(blob);
-    //     resolve(this.fileUrl);
-    //   }, 'image/jpeg');
-    // });
   }
 
-  onSubmitHandler = event => {
+  onDownloadHandler = (contentType, base64Data, fileName) => {
+    console.log("Inside onDownloadHandler()");
+    // const linkSource = `data:${contentType};base64,${base64Data}`;
+    const linkSource = `${base64Data}`;
+    const downloadLink = document.createElement("a");
+    downloadLink.href = linkSource;
+    downloadLink.download = fileName;
+    downloadLink.click();
+  }
+
+  onSubmitHandler = async event => {
     // console.log(this.state.croppedImage);
 
     let imageObj = {
@@ -160,15 +156,27 @@ class ImageUploader extends PureComponent {
       croppedData: this.state.croppedImage
     };
 
-    // console.log(imageObj);
-    axios.post('/images', imageObj)
-      .then((data) => {
-          alert("Image has been successfully uploaded");
+    try {
+      // console.log(imageObj);
+      this.setState({
+        ...this.state,
+        spin: true
       })
-      .catch((err) => {
-        alert("Error while uploading image");
-      });
-
+      await axios.post('http://localhost:5000/images', imageObj);
+      this.setState({
+        ...this.state,
+        spin: false,
+        uploadStatus: true
+      })
+      } catch (err) {
+          alert("Error while uploading image");
+      }
+      setTimeout(() => {
+        this.setState({
+          ...this.state,
+          uploadStatus: false
+        })
+      },3000);
   }
 
   render() {
@@ -197,45 +205,46 @@ class ImageUploader extends PureComponent {
     // console.log("Inside render() : croppedImage Array " + croppedImage);
 
     return (
-      <div style={{
-          display: 'flex',
-          flexFlow: 'column',
-          margin: '70px auto',
-          alignItems: 'center',
-        }}>
-          <div style={{display: 'flex', flexFlow: 'column', margin: '20px auto'}}>
+      <div className={classes.Container}>
+          
             <input type="file" accept="image/*" onChange={this.onSelectFile} />
             <button
-              className={classes.Button}
+              className={classes.ImageUploadButton}
               disabled={this.state.disabled}
               onClick={this.onSubmitHandler}>
               Upload to Server
             </button>
-          </div>
+            {this.state.spin && <Spinner percentage={this.state.percentage} />}
+          
+          {this.state.uploadStatus && 
+            <p className={classes.Message}>Image uploaded Successfully</p>}
           
           {disabled && 
           <p>Upload image of dimension 1024 x 1024 to enable Submit button </p>}  
 
-          <div
-            style={{
-              display: 'flex',
-              flexFlow: 'column',
-              alignItems: 'center'}}>
-
-            {src && 
-              <div>
-                <h3>Uploaded Image</h3>   
-                <img src={this.state.src} alt="Original" /> 
-              </div>}
-
             {src && disabled && <p>Your Image does not have correct dimensions . 
                   Try uploading some other image</p>}
             
+            {src && <div className={classes.ImageDetails}>
+                <h3>Uploaded Image</h3>   
+                <img src={this.state.src} alt="Original" /> 
+                <button
+                  className={classes.Button}
+                  onClick={() => 
+                    this.onDownloadHandler
+                    ('image/jpeg', this.state.src, "Uploaded Image")}
+                >
+                    Download
+                </button>
+              </div> }
+
             {cropsImages}
 
             {this.state.croppedImage && 
               this.state.croppedImage.map( cropped => (
-                <Fragment key = {cropped.croppedImageName}>
+                <div 
+                  key = {cropped.croppedImageName}
+                  className = {classes.ImageDetails}>
                     <h3>{cropped.croppedImageName}</h3>
                     <img 
                       alt="Crop" 
@@ -245,11 +254,15 @@ class ImageUploader extends PureComponent {
                       }}
                       title={cropped.croppedImageName}
                       src={cropped.croppedImageUrl} />
-                </Fragment>
+                      <button
+                        className={classes.Button}
+                        onClick={() => this.onDownloadHandler('image/jpeg', cropped.croppedImageUrl, cropped.croppedImageName)}
+                      >
+                          Download
+                      </button>
+                </div>
               ))
             }
-
-          </div>
       
       </div>
     );

@@ -32,17 +32,11 @@ class Images extends Component {
         if(this.state.loaded) {
           displayImage = this.state.images.map(image => (
                         <div key={image._id}
-                            style={{
-                                display: 'flex',
-                                flexFlow: 'column',
-                                alignItems: 'center',
-                                margin: '10px',
-                                padding: '10px 0'
-                            }}>
+                             className={classes.ImageDetails}>
                             <img
                                 src={image.imageData}
                                 alt={image.imageName} />
-                            <Link to={`/images/${image._id}`} className={classes.Button}>
+                            <Link to={`/images/${image._id}`} className={classes.Message}>
                                 Click to view Cropped Images with all Dimensions
                             </Link>
                         </div>

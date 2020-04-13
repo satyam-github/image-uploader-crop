@@ -1,37 +1,31 @@
 
-.main-heading {
-    text-transform: uppercase;
-    text-align: center;
-    color: white;
-  }
-  
-  .image-container {
-    border-radius: 1rem;
-    padding: 1.5rem;
-  }
-  
-  .process {
-    background-color: whitesmoke;
-    border-radius: 1rem;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-  }
-  
-.Button:disabled {
+.ImageUploadButton:disabled {
     color: white;
     cursor: not-allowed;
     background-color: #ccc;
 }
 
+
 .Button {
     color: white;
     outline: none;
     margin: 20px auto;
+    cursor: pointer;
+    width: 50%;
     padding: 10px;
     margin: 10px auto;
     background-color: #5C9210;
 }
 
+.Message {
+  background: #9ACD32;
+  color: white;
+  width: 80%;
+  text-align: center;
+  box-shadow: 1 2px 3px #ccc;
+  padding: 10px 5px;
+  margin: 10px auto;
+}
 
 .ImageHeading {
     text-transform: uppercase;
@@ -40,20 +34,33 @@
   }
   
   .ImageDetails {
-    text-align: center;
+    width: 80%;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    border: 2px solid #ccc;
+    box-shadow: 1 2px 3px #ccc;
+    padding: 10px;
+    margin: 10px auto;
+    box-sizing: border-box
   }
   
   .ImageUploadButton {
-    display: block;
-    margin: 2.5rem auto;
-    text-align: center;
+    color: white;
+    outline: none;
+    margin: 20px auto;
+    cursor: pointer;
+    padding: 10px;
+    margin: 10px auto;
+    background-color: #5C9210;
   }
   
-  .ImageContainer {
+  .Container {
     display: block;
-    margin: 0 auto;
-    width: 250px;
-    height: 250px;
+    margin: 70px auto;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
   }
 /*   
   .main-credit {
