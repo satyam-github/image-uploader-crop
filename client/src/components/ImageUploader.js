@@ -162,7 +162,7 @@ class ImageUploader extends PureComponent {
         ...this.state,
         spin: true
       })
-      await axios.post('http://localhost:5000/images', imageObj);
+      await axios.post('/images', imageObj);
       this.setState({
         ...this.state,
         spin: false,
